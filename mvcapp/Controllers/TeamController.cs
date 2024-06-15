@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mvcapp.Models.Team;
-using mvcapp.Models.Users;
 
 namespace mvcapp.Controllers
 {
@@ -28,12 +27,12 @@ namespace mvcapp.Controllers
 
         private async Task<IEnumerable<Team>> GetUserTeams()
         {
-            var t =  await _context.Teams
-                                   .Where(x => x.Members.Any(m => m.Id == CurrentUserId))
-                                   .ToListAsync();
-            t.ForEach(x => x.CurrentUserIsOwner = CurrentUserId == x.OwnerId);
+            var t = await _context.Teams.Include(x => x.Members)
+                                  .Include(x => x.Owner)
+                                  .Where(x => x.Members.Any(m => m.Id == CurrentUserId))
+                                  .ToListAsync();
 
-            var t2 = await _context.Users.ToListAsync();
+            t.ForEach(x => x.CurrentUserIsOwner = CurrentUserId == x.OwnerId);
 
             return t;
         }
@@ -68,6 +67,54 @@ namespace mvcapp.Controllers
             model.MyTeams = await GetUserTeams();
 
             return View("Index", model);
+        }
+
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var team = await _context.Teams
+                                     .Include(x => x.Members)
+                                     .FirstOrDefaultAsync(x => x.Id == id);
+            if (team == null)
+            {
+                ViewBag.DeleteTeamError = "Команды не существует";
+                return View("Index", new TeamsViewModel
+                {
+                    MyTeams = await GetUserTeams()
+                });
+            }
+
+            if (team.Members.Count() > 1)
+            {
+                ViewBag.DeleteTeamError = "В команде есть участники";
+                return View("Index", new TeamsViewModel
+                {
+                    MyTeams = await GetUserTeams()
+                });
+            }
+
+            _context.Teams.Remove(team);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> LeaveAsync(int id)
+        {
+            var team = await _context.Teams.Include(x => x.Members).FirstOrDefaultAsync(x => x.Id == id);
+            if (team != null)
+            {
+                var currentUser = await _context.Users.Include(x => x.Teams).SingleAsync(x => x.Id == CurrentUserId);
+
+                team.Members.Remove(currentUser);
+                currentUser.Teams.Remove(team);
+
+                _context.Teams.Update(team);
+                _context.Users.Update(currentUser);
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }

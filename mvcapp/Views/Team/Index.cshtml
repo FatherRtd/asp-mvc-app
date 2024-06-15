@@ -31,8 +31,10 @@
             </div>
 
             <hr />
-
-            <h2 class=“text-center”>Ваши команды</h2>
+            <div class="d-flex align-items-center gap-2">
+                <h2 class=“text-center”>Ваши команды</h2>
+                <div class="text-danger mb-2">@ViewBag.DeleteTeamError</div>
+            </div>
             @if (Model.MyTeams.Any())
             {
                 @foreach (var team in Model.MyTeams)
@@ -50,7 +52,14 @@
                                         <span class="fw-bold">Владелец:</span>
                                         <span>Вы</span>
                                     </div>
-                                    <button class="btn btn-danger">Удалить</button>
+                                    <div>
+                                        <span class="fw-bold">Участники: </span>
+                                        <span>@team.Members.Count()</span>
+                                    </div>
+                                    @using (Html.BeginForm("Delete", "Team", new { id = team.Id }))
+                                    {
+                                        <button class="btn btn-danger">Удалить</button>
+                                    }
                                 }
                                 else
                                 {
@@ -58,7 +67,11 @@
                                         <span class="fw-bold">Владелец:</span>
                                         <span>@team.Owner.Name @team.Owner.Surname</span>
                                     </div>
-                                    <button class="btn btn-primary">Покинуть</button>
+                                    
+                                    @using (Html.BeginForm("Leave", "Team", new {id = team.Id}))
+                                    {
+                                        <button class="btn btn-primary" type="submit">Покинуть</button>
+                                    }
                                 }
                             </div>
                         </div>
