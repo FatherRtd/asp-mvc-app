@@ -53,7 +53,7 @@ namespace mvcapp.Controllers
 			var claims = new List<Claim>
 			{
 				new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-				new Claim(ClaimsIdentity.DefaultNameClaimType, $"{user.Name} {user.Surname}")
+                new Claim(ClaimsIdentity.DefaultNameClaimType, $"{user.Name} {user.Surname}"),
             };
 
 			var id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
@@ -73,7 +73,7 @@ namespace mvcapp.Controllers
 			var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email);
 			if (user != null)
             {
-				ViewBag.RegiterError = "Пользователь с таким логином уже существует";
+				ViewBag.Error = "Пользователь с таким логином уже существует";
 				return View("Index", new UsersViewModel
 				{
 					RegisterViewModel = model
