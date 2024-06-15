@@ -17,12 +17,37 @@ namespace mvcapp.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             return View(new TeamsViewModel
             {
                 MyTeams = await GetUserTeams(),
             });
+        }
+
+        public async Task<IActionResult> ById(int id)
+        {
+            var team = await GetTeam(id);
+
+            if (team == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            team.CurrentUserIsOwner = team.Owner.Id == CurrentUserId;
+            return View("Team", new TeamViewModel
+            {
+                Team = await GetTeam(id),
+            });
+        }
+
+        private async Task<Team?> GetTeam(int id)
+        {
+            var team = await _context.Teams.Include(x => x.Members)
+                                     .Include(x => x.Owner)
+                                     .FirstOrDefaultAsync(x => x.Id == id);
+
+            return team;
         }
 
         private async Task<IEnumerable<Team>> GetUserTeams()
@@ -115,6 +140,52 @@ namespace mvcapp.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> KickUserAsync(int userId, int teamId)
+        {
+            var user = await _context.Users.Include(x => x.Teams).SingleOrDefaultAsync(x => x.Id == userId);
+            var team = await GetTeam(teamId);
+
+            team.Members.Remove(user);
+            user.Teams.Remove(team);
+
+            _context.Users.Update(user);
+            _context.Teams.Update(team);
+
+            await _context.SaveChangesAsync();
+
+            return View("Team", new TeamViewModel
+            {
+                Team = team
+            });
+        }
+
+        public async Task<IActionResult> SetOwnerAsync(int userId, int teamId)
+        {
+            var user = await _context.Users.Include(x => x.OwnedTeams).SingleOrDefaultAsync(x => x.Id == userId);
+            var team = await GetTeam(teamId);
+            var currentUser = await _context.Users.Include(x => x.OwnedTeams).SingleOrDefaultAsync(x => x.Id == CurrentUserId);
+
+            if (user == null || team == null || currentUser == null)
+            {
+                throw new NotImplementedException();
+            }
+
+            team.Owner = user;
+            currentUser.OwnedTeams.Remove(team);
+            user.OwnedTeams.Add(team);
+
+            _context.Users.Update(user);
+            _context.Users.Update(currentUser);
+            _context.Teams.Update(team);
+
+            await _context.SaveChangesAsync();
+
+            return View("Team", new TeamViewModel
+            {
+                Team = team
+            });
         }
     }
 }

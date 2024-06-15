@@ -42,7 +42,7 @@
                     <div class="card mb-2">
                         <div class="card-header d-flex align-items-center justify-content-between">
                             <div class="fw-bold">@team.Name</div>
-                            <button class="btn btn-primary">Подробнее</button>
+                            <div>@Html.ActionLink("Подробнее", "ById", "Team", new { id = team.Id }, new { @class = "btn btn-primary" })</div>
                         </div>
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between">
@@ -70,7 +70,7 @@
                                     
                                     @using (Html.BeginForm("Leave", "Team", new {id = team.Id}))
                                     {
-                                        <button class="btn btn-primary" type="submit">Покинуть</button>
+                                        <button class="btn btn-danger" type="submit">Покинуть</button>
                                     }
                                 }
                             </div>
