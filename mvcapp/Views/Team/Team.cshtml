@@ -1,13 +1,35 @@
 ﻿@using mvcapp.Models.Team;
+@using Domain.Entities
+
 @model TeamViewModel;
 
 @{
     ViewData["Title"] = Model.Team.Name;
+    var teams = new List<Team> { Model.Team };
 }
 
 <div>
     <div>
+        @using (Html.BeginForm("AddUser", "Team", FormMethod.Post)) 
+        {
+            @Html.HiddenFor(model => model.Team)
 
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedUserId, "User")
+                @Html.DropDownListFor(model => model.SelectedUserId, 
+                    new SelectList(Model.Users, "Id", "FullName"), 
+                    "Выберите пользователя",
+                    new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.DropDownListFor(model => model.SelectedTeamId,
+                         new SelectList(teams, "Id", "Name"),
+                    new { @class = "form-control", style = "display: none;" })
+            </div>
+
+            <input type="submit" value="Добавить" class="btn btn-primary" />
+        }
+        <div class="text-danger mb-2">@ViewBag.AddUserError</div>
     </div>
     <h3 class="fw-bold mb-3">@Model.Team.Name</h3>
     <table class="table">

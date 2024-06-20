@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Domain.Entities;
 
 public class User : Entity
 {
@@ -9,4 +11,7 @@ public class User : Entity
 
 	public List<Team> Teams { get; set; } = new();
 	public List<Team> OwnedTeams = new();
+
+	[NotMapped]
+	public string FullName => $"{Name} {Surname}";
 }

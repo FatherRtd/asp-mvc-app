@@ -35,9 +35,12 @@ namespace mvcapp.Controllers
             }
 
             team.CurrentUserIsOwner = team.Owner.Id == CurrentUserId;
+
+            var users = await _context.Users.ToListAsync();
             return View("Team", new TeamViewModel
             {
                 Team = await GetTeam(id),
+                Users = users
             });
         }
 
@@ -155,10 +158,7 @@ namespace mvcapp.Controllers
 
             await _context.SaveChangesAsync();
 
-            return View("Team", new TeamViewModel
-            {
-                Team = team
-            });
+            return Redirect($"/Team/ById/{team.Id}");
         }
 
         public async Task<IActionResult> SetOwnerAsync(int userId, int teamId)
@@ -182,10 +182,45 @@ namespace mvcapp.Controllers
 
             await _context.SaveChangesAsync();
 
-            return View("Team", new TeamViewModel
+            return Redirect($"/Team/ById/{team.Id}");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddUser(TeamViewModel model)
+        {
+            var team = await _context.Teams.Include(x => x.Members).Include(x => x.Owner).SingleOrDefaultAsync(x => x.Id == model.SelectedTeamId);
+            var user = await _context.Users.Include(x => x.Teams).SingleOrDefaultAsync(x => x.Id == model.SelectedUserId);
+
+            var users = await _context.Users.ToListAsync();
+
+            if (user == null)
             {
-                Team = team
-            });
+                ViewBag.AddUserError = "Пользователь не выбран";
+                return View("Team", new TeamViewModel
+                {
+                    Team = team,
+                    Users = users
+                });
+            }
+
+            if (team.Members.Any(x => x.Id == user.Id))
+            {
+                ViewBag.AddUserError = "Пользователь уже в этой команде";
+                return View("Team", new TeamViewModel
+                {
+                    Team = team,
+                    Users = users
+                });
+            }
+
+            team.Members.Add(user);
+            user.Teams.Add(team);
+
+            _context.Users.Update(user);
+            _context.Teams.Update(team);
+            await _context.SaveChangesAsync();
+
+            return Redirect($"/Team/ById/{team.Id}");
         }
     }
 }
