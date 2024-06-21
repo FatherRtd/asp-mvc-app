@@ -10,5 +10,7 @@ namespace mvcapp.Models.Team
         public bool CurrentUserIsOwner { get; set; }
 
         public IEnumerable<Domain.Entities.Team>? MyTeams { get; set; }
+
+        public PageViewModel PageViewModel { get; set; }
     }
 }

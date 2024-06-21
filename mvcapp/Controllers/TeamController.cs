@@ -3,6 +3,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using mvcapp.Models;
 using mvcapp.Models.Team;
 
 namespace mvcapp.Controllers
@@ -19,9 +20,18 @@ namespace mvcapp.Controllers
 
         public async Task<IActionResult> Index(int page = 1)
         {
+            int pageSize = 3;
+            var teams = await GetUserTeams();
+            var count = await _context.Teams.CountAsync();
+
+            teams = teams.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var pageViewModel = new PageViewModel(count, page, pageSize);
+
             return View(new TeamsViewModel
             {
-                MyTeams = await GetUserTeams(),
+                MyTeams = teams,
+                PageViewModel = pageViewModel
             });
         }
 

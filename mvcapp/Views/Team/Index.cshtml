@@ -77,6 +77,19 @@
                         </div>
                     </div>
                 }
+
+                <p>
+                    <a asp-action="Index"
+                       asp-route-page="@(Model.PageViewModel.PageNumber - 1)" class="btn btn-primary @(Model.PageViewModel.HasPreviousPage ? "" : "disabled")">
+                        Назад
+                    </a>
+
+
+                    <a asp-action="Index"
+                       asp-route-page="@(Model.PageViewModel.PageNumber + 1)" class="btn btn-primary @(Model.PageViewModel.HasNextPage ? "" : "disabled")">
+                        Вперед
+                    </a>
+                </p>
             }
             else
             {
