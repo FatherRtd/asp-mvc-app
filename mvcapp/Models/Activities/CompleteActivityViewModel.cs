@@ -2,10 +2,11 @@
 
 namespace mvcapp.Models.Activities
 {
-    public class ActivityViewModel
+    public class CompleteActivityViewModel
     {
         public Activity Activity { get; set; }
 
-        public CompleteActivityViewModel CompleteActivity { get; set; }
+        public int ActivityId { get; set; }
+        public int Mark { get; set; }
     }
 }

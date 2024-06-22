@@ -2,5 +2,41 @@
 @model ActivityViewModel;
 
 <div>
-    @Model.Activity.Name
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex align-items-center justify-content-between">
+                <h3>@Model.Activity.Name</h3>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="badge bg-info">
+                        Тип: @Model.Activity.Type.Name
+                    </div>
+                    <div class="badge bg-success">
+                        Команда: @Model.Activity.Team.Name
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Описание</h5>
+            <p class="card-text">@Model.Activity.Description</p>
+            
+        </div>
+        <div class="card-footer">
+            @if (Model.Activity.EndDate == null){
+                await Html.RenderPartialAsync("CompleteActivity", Model.CompleteActivity);
+            }
+            else
+            {
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="badge bg-primary">
+                        Выполнено @Model.Activity.EndDate.Value.ToLocalTime()
+                    </div>
+                    
+                    <div>
+                        Оценка - @Model.Activity.Mark из @Model.Activity.Type.MaxMark
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
 </div>

@@ -2,11 +2,9 @@
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using mvcapp.Models;
 using mvcapp.Models.Activities;
-using mvcapp.Models.Users;
 
 namespace mvcapp.Controllers
 {
@@ -52,10 +50,14 @@ namespace mvcapp.Controllers
 
         public async Task<IActionResult> ById(int id)
         {
-            var activity = await _context.Activities.SingleOrDefaultAsync(x => x.Id == id);
+            var activity = await _context.Activities.Include(x => x.Team).Include(x => x.Type).SingleOrDefaultAsync(x => x.Id == id);
             return View("Activity", new ActivityViewModel
             {
-                Activity = activity
+                Activity = activity,
+                CompleteActivity = new CompleteActivityViewModel
+                {
+                    Activity = activity
+                }
             });
         }
 
@@ -106,6 +108,30 @@ namespace mvcapp.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Complete(CompleteActivityViewModel model)
+        {
+            var activity = await _context.Activities.Include(x => x.Team).Include(x => x.Type).SingleOrDefaultAsync(x => x.Id == model.ActivityId);
+
+            if (model.Mark < 0 || model.Mark > activity.Type.MaxMark)
+            {
+                model.Activity = activity;
+                ViewBag.CompleteActivityError = $"Оценка должна быть от 0 до {activity.Type.MaxMark}";
+                return View("Activity", new ActivityViewModel
+                {
+                    Activity = activity,
+                    CompleteActivity = model
+                });
+            }
+
+            activity.EndDate = DateTime.UtcNow;
+            activity.Mark = model.Mark;
+
+            _context.Activities.Update(activity);
+            await _context.SaveChangesAsync();
+
+            return Redirect($"/Activity/ById/{activity.Id}");
         }
     }
 }

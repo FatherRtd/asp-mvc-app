@@ -1,0 +1,25 @@
+﻿@using mvcapp.Models.Activities
+@model CompleteActivityViewModel
+
+@{
+    var id = Model.Activity.Id;
+    var maxMark = Model.Activity.Type.MaxMark;
+}
+
+<form asp-action="Complete" asp-controller="Activity">
+    <div>
+        <input asp-for="ActivityId" class="d-none" value="@id" />
+        <div class="d-flex align-items-center gap-2">
+            <div class="input-group">
+
+                <div class="form-floating">
+                    <input asp-for="Mark" type="number" min="0" max="@maxMark" class="form-control" placeholder="Введите оценку" />
+                    <label asp-for="Mark" class="form-label">Оценка</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Выполнить</button>
+        </div>
+        <span class="text-danger" asp-validation-for="Mark"></span>
+    </div>
+    <div class="text-danger mb-2">@ViewBag.CompleteActivityError</div>
+</form>
