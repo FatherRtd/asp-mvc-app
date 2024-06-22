@@ -22,14 +22,14 @@
         {
             <div class="card mb-2">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                    <div class="fw-bold">@activity.Name</div>
+                    <div class="fw-bold">@activity.Name <span class="badge bg-info">Тип: @activity.Type.Name</span> <span class="badge bg-success">Команда: @activity.Team.Name</span></div>
+                    
                     <div>@Html.ActionLink("Подробнее", "ById", "Activity", new { id = activity.Id }, new { @class = "btn btn-primary" })</div>
                 </div>
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <p>Описание: @activity.Description</p>
-                            <p>Тип: @activity.Type.Name</p>
                         </div>
                         <div></div>
                     </div>

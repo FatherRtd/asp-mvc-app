@@ -50,9 +50,13 @@ namespace mvcapp.Controllers
             return View(viewModel);
         }
 
-        public IActionResult ById(int id)
+        public async Task<IActionResult> ById(int id)
         {
-            return View("Activity");
+            var activity = await _context.Activities.SingleOrDefaultAsync(x => x.Id == id);
+            return View("Activity", new ActivityViewModel
+            {
+                Activity = activity
+            });
         }
 
         public async Task<IActionResult> Add(AddActivityViewModel model)
