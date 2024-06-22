@@ -1,4 +1,69 @@
-﻿
+﻿@using mvcapp.Models.Activities;
+@model ActivitiesViewModel;
+
+@{
+    ViewData["Title"] = "Активности";
+}
+
 <div>
-    Activity
+    
+    <hr />
+
+    <div class="d-flex align-items-center gap-2">
+        <h2 class=“text-center”>Активности ваших команд</h2>
+    </div>
+    @if (Model.Activities.Any())
+    {
+        @foreach (var activity in Model.Activities)
+        {
+            <div class="card mb-2">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <div class="fw-bold">@activity.Name</div>
+                    <div>@Html.ActionLink("Подробнее", "ById", "Team", new { id = activity.Id }, new { @class = "btn btn-primary" })</div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p>Описание: @activity.Description</p>
+                            <p>Тип: @activity.Type.Name</p>
+                        </div>
+                        <div></div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <div><span class="fw-bold">Создана</span> @activity.StartDate</div>
+                    @if (activity.EndDate == null)
+                    {
+                        <div><span class="fw-bold">Статус</span> В процессе</div>
+                    }
+                    else
+                    {
+                        <div>
+                            <div><span class="fw-bold">Статус</span> Выполнена @activity.EndDate</div>
+                            <div><span class="fw-bold">Оценка</span> @activity.Mark из @activity.Type.MaxMark</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <p>
+            <a asp-action="Index"
+               asp-route-page="@(Model.PageViewModel.PageNumber - 1)" class="btn btn-primary @(Model.PageViewModel.HasPreviousPage ? "" : "disabled")">
+                Назад
+            </a>
+
+
+            <a asp-action="Index"
+               asp-route-page="@(Model.PageViewModel.PageNumber + 1)" class="btn btn-primary @(Model.PageViewModel.HasNextPage ? "" : "disabled")">
+                Вперед
+            </a>
+        </p>
+    }
+    else
+    {
+        <div class=“alert alert-info” role=“alert”>
+            У вас еще нет активностей.
+        </div>
+    }
 </div>
