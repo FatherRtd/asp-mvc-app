@@ -1,0 +1,72 @@
+﻿@using mvcapp.Models.Activities
+@model AddActivityViewModel;
+
+@{
+    var items = new SelectList(Model.Types, "Id", "Name");
+    var teams = new SelectList(Model.Teams, "Id", "Name");
+}
+
+
+<form asp-action="Add" asp-controller="Activity">
+    <h2>Добавление активности</h2>
+    <div class="d-flex align-items-center gap-2">
+        <div >
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+                <div class="form-floating">
+                    <input asp-for="Name" type="text" class="form-control" placeholder="Введите название активности"/>
+                    <label asp-for="Name" class="form-label">Название</label>
+                </div>
+            </div>
+            <span class="text-danger" asp-validation-for="Name"></span>
+        </div>
+
+        <div >
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+                <div class="form-floating">
+                    <input asp-for="Description" type="text" class="form-control" placeholder="Введите описание"/>
+                    <label asp-for="Description" class="form-label">Описание</label>
+                </div>
+            </div>
+            <span class="text-danger" asp-validation-for="Description"></span>
+        </div>
+
+        <div >
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+                <div class="form-floating">
+                    <select asp-for="TypeId" asp-items="items" class="form-control" placeholder="Выберите тип"></select>
+                    <label asp-for="TypeId" class="form-label">Тип</label>
+                </div>
+            </div>
+            <span class="text-danger" asp-validation-for="TypeId"></span>
+        </div>
+        
+        <div>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+                <div class="form-floating">
+                    <select asp-for="TeamId" asp-items="teams" class="form-control" placeholder="Выберите тип"></select>
+                    <label asp-for="TeamId" class="form-label">Тип</label>
+                </div>
+            </div>
+            <span class="text-danger" asp-validation-for="TeamId"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Добавить</button>
+    </div>
+
+
+
+    <div class="text-danger mb-2">@ViewBag.AddActivityError</div>
+
+</form>

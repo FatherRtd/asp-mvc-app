@@ -6,11 +6,15 @@
 }
 
 <div>
-    
-    <hr />
+
+    @{
+        await Html.RenderPartialAsync("AddActivity", Model.AddViewModel);
+    }
+
+    <hr/>
 
     <div class="d-flex align-items-center gap-2">
-        <h2 class=“text-center”>Активности ваших команд</h2>
+        <h2>Активности ваших команд</h2>
     </div>
     @if (Model.Activities.Any())
     {
@@ -19,7 +23,7 @@
             <div class="card mb-2">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <div class="fw-bold">@activity.Name</div>
-                    <div>@Html.ActionLink("Подробнее", "ById", "Team", new { id = activity.Id }, new { @class = "btn btn-primary" })</div>
+                    <div>@Html.ActionLink("Подробнее", "ById", "Activity", new { id = activity.Id }, new { @class = "btn btn-primary" })</div>
                 </div>
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
@@ -31,7 +35,7 @@
                     </div>
                 </div>
                 <div class="card-footer d-flex align-items-center justify-content-between">
-                    <div><span class="fw-bold">Создана</span> @activity.StartDate</div>
+                    <div><span class="fw-bold">Создана</span> @activity.StartDate.Value.ToLocalTime()</div>
                     @if (activity.EndDate == null)
                     {
                         <div><span class="fw-bold">Статус</span> В процессе</div>
@@ -39,7 +43,7 @@
                     else
                     {
                         <div>
-                            <div><span class="fw-bold">Статус</span> Выполнена @activity.EndDate</div>
+                            <div><span class="fw-bold">Статус</span> Выполнена @activity.EndDate.Value.ToLocalTime()</div>
                             <div><span class="fw-bold">Оценка</span> @activity.Mark из @activity.Type.MaxMark</div>
                         </div>
                     }
